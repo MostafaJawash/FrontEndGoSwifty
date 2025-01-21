@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "32945533181",
+    "project_id": "goswiftapp-9c07c",
+    "storage_bucket": "goswiftapp-9c07c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:32945533181:android:f988cd1c98950c1259ce94",
+        "android_client_info": {
+          "package_name": "com.example.delivery"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnYgklAxUIcSvFZVZvFDWunP_AFFJhRu4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

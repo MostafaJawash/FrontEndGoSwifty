@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
 
-// ignore: must_be_immutable
 class CustomFormTextField extends StatelessWidget {
-  CustomFormTextField(
-      {required this.hintText, this.onChanged, this.obscureText = false,required this.lable});
-  Function(String)? onChanged;
-  String hintText;
-  String lable;
-  bool? obscureText;
+  CustomFormTextField({
+    required this.hintText,
+    this.onChanged,
+    this.obscureText = false,
+    required this.lable,
+    this.validator, 
+  });
+
+  final Function(String)? onChanged;
+  final String hintText;
+  final String lable;
+  final bool? obscureText;
+  final String? Function(String?)? validator;
+
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
+    return TextFormField(style: TextStyle(color: Colors.white),
       obscureText: obscureText!,
-      validator: (data) {
-        if (data!.isEmpty) {
-          return 'Field is required';
-        }
-      },
+      validator: validator,
       onChanged: onChanged,
       decoration: InputDecoration(
         label: Text(
@@ -30,7 +33,12 @@ class CustomFormTextField extends StatelessWidget {
             borderSide: BorderSide(color: Colors.white)),
         border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20),
-            borderSide: BorderSide(color: Colors.white)),
+            borderSide: BorderSide(color: Color(0xffC47DFF))),
+     
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide(color: Color(0xffC47DFF)),
+        ),
       ),
     );
   }

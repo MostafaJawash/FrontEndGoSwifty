@@ -1,55 +1,56 @@
-import 'package:delivery/screens/homeScreen.dart';
 import 'package:delivery/screens/loginScreen.dart';
-
 import 'package:delivery/widgets/customlistTitle.dart';
 import 'package:flutter/material.dart';
 
 class SettingScreen extends StatefulWidget {
-   SettingScreen({super.key});
+  SettingScreen({super.key});
 
   @override
   State<SettingScreen> createState() => _SettingScreenState();
 }
 
 class _SettingScreenState extends State<SettingScreen> {
-  bool?  isDarkMode = false;
-    bool?  isEnglish = false;
+  bool? isDarkMode = false;
+  bool? isEnglish = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 82, 92, 115),
+      backgroundColor: Color.fromARGB(200, 167, 110, 213),
       appBar: AppBar(
-        iconTheme: const IconThemeData(
-            color: Color.fromARGB(255, 136, 245, 225), size: 28, opacity: 99),
+        iconTheme:
+            const IconThemeData(color: Colors.white, size: 28, opacity: 99),
         title: Text(
           'Setting',
           style: TextStyle(
-            color: const Color.fromARGB(255, 136, 245, 225),
+            color: Colors.white,
           ),
         ),
-        backgroundColor: const Color.fromARGB(255, 64, 72, 89),
+        backgroundColor: Color.fromARGB(120, 55, 3, 97),
       ),
       body: ListView(
         children: [
-          
+          SizedBox(
+            height: 20,
+          ),
+          //Color.fromARGB(120, 158, 84, 218),
           CustomListTile(
               nameWidget: 'Them',
               icon: Icons.light_mode,
-              ontap: ()=>  showThemeDialog()),
+              ontap: () => showThemeDialog()),
           CustomListTile(
               nameWidget: 'Language',
               icon: Icons.language,
-              ontap:()=> showLanguageDialog()),
+              ontap: () => showLanguageDialog()),
           CustomListTile(
               nameWidget: 'Log Out',
               icon: Icons.logout,
-              ontap:()=> Loginscreen()),
-       
+              ontap: () => Loginscreen()),
         ],
       ),
     );
   }
-void showThemeDialog() {
+
+  void showThemeDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -65,7 +66,7 @@ void showThemeDialog() {
                   setState(() {
                     isDarkMode = false;
                   });
-                  Navigator.of(context).pop(); // إغلاق النافذة
+                  Navigator.of(context).pop();
                 },
               ),
               ListTile(
@@ -75,7 +76,7 @@ void showThemeDialog() {
                   setState(() {
                     isDarkMode = true;
                   });
-                  Navigator.of(context).pop(); 
+                  Navigator.of(context).pop();
                 },
               ),
             ],
@@ -83,11 +84,8 @@ void showThemeDialog() {
         );
       },
     );
-
-
-
-    
   }
+
   void showLanguageDialog() {
     showDialog(
       context: context,
@@ -99,22 +97,22 @@ void showThemeDialog() {
             children: [
               ListTile(
                 title: Text(' Arabic'),
-                leading: Icon(Icons.light_mode),
+                leading: Icon(Icons.language_rounded),
                 onTap: () {
                   setState(() {
                     isEnglish = false;
                   });
-                  Navigator.of(context).pop(); 
+                  Navigator.of(context).pop();
                 },
               ),
               ListTile(
                 title: Text('English'),
-                leading: Icon(Icons.dark_mode),
+                leading: Icon(Icons.language_rounded),
                 onTap: () {
                   setState(() {
                     isEnglish = true;
                   });
-                  Navigator.of(context).pop(); 
+                  Navigator.of(context).pop();
                 },
               ),
             ],
@@ -122,18 +120,5 @@ void showThemeDialog() {
         );
       },
     );
-
-
-
-    
   }
-  
-  
-  }
-
-
-
-
-
-
-
+}

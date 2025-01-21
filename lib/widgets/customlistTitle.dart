@@ -28,7 +28,7 @@ class CustomListTile extends StatelessWidget {
             icon,
             color: const Color.fromARGB(255, 136, 245, 225),
           ),
-        onTap: ontap,
+          onTap: ontap,
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 0),

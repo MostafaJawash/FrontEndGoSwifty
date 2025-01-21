@@ -1,10 +1,9 @@
-// ignore_for_file: prefer_const_constructors
-
+import 'package:delivery/Services/apiServicesAuth.dart';
+import 'package:delivery/screens/globals.dart';
+import 'package:delivery/screens/store.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-
-
 
 class UserProfileScreen extends StatefulWidget {
   @override
@@ -13,20 +12,62 @@ class UserProfileScreen extends StatefulWidget {
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _firstNameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _pinController = TextEditingController();  // إضافة الـ TextEditingController لرمز الـ PIN
+  TextEditingController _firstNameController =
+      TextEditingController(text: Authmos.firstName ?? '');
+  TextEditingController _lastNameController =
+      TextEditingController(text: Authmos.lastName ?? '');
+  TextEditingController _phoneController =
+      TextEditingController(text: Authmos.phoneNumber ?? '');
+  TextEditingController _LocationController =
+      TextEditingController(text: Authmos.location ?? '');
+  TextEditingController _emailController =
+      TextEditingController(text: Authmos.email ?? '');
 
   XFile? _userImage;
+  final imagee = Authmos.image;
+  String imagehttp = AppImage.appImage;
 
-  // Function to pick an image from the gallery
+Widget buildImageWidget() {
+  if (imagee == null) {
+    return Center(
+      child: _userImage == null
+          ? CircleAvatar(
+              radius: 50,
+              backgroundColor: Colors.grey[300],
+              child: Icon(Icons.camera_alt, size: 40, color: Colors.white),
+            )
+          : CircleAvatar(
+              radius: 50,
+              backgroundImage: FileImage(File(_userImage!.path)),
+              //FileImage(File(_userImage!.path)),
+            ),
+    );
+  } else {
+    return Center(
+      child: ClipOval(
+        child: FadeInImage(
+          placeholder: AssetImage('lib/assest/mostafa.jpg'), 
+          image: NetworkImage('$imagee'),
+          fit: BoxFit.cover,
+          width: 150,
+          height: 150,
+          imageErrorBuilder: (context, error, stackTrace) => CircleAvatar(
+            radius: 75,
+            backgroundColor: Colors.grey[300],
+            child: Icon(Icons.error, color: Colors.red, size: 50),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    final XFile? pickedFile =
+        await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _userImage = pickedFile;
@@ -34,195 +75,186 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     }
   }
 
+
+
+  Future<void> _updateProfile() async {
+    if (_formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Updating profile...')),
+      );
+
+      final response = await ApiUpdateProfile.updateProfile(
+        token: Authmos.tokenmos ?? '',
+        firstName: _firstNameController.text,
+        lastName: _lastNameController.text,
+        email: _emailController.text,
+        phoneNumber: _phoneController.text,
+        location: _LocationController.text,
+        image: _userImage != null ? File(_userImage!.path) : null,
+      );
+
+      if (response['success'] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response['message'])),
+        );
+        setState(() {});
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response['message'])),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('User Profile'),
-        backgroundColor: Colors.blueAccent,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: [
-            // Centered User Image at the top, round image
-            Center(
-              child: _userImage == null
-                  ? CircleAvatar(
-                      radius: 50, // Size of the circle
-                      backgroundColor: Colors.grey[300],
-                      child: Icon(Icons.camera_alt, size: 40, color: Colors.white),
-                    )
-                  : CircleAvatar(
-                      radius: 50, // Size of the circle
-                      backgroundImage: FileImage(File(_userImage!.path)),
+    return Directionality(
+      textDirection: Language == true ? TextDirection.rtl : TextDirection.ltr,
+      child: Scaffold(
+        appBar: AppBar(
+          title:  Text(
+            Language == true ? 'ملفي الشخصي' : 'User Profile',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Color.fromARGB(255, 118, 45, 177),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              children: [
+                buildImageWidget(),
+                SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: _pickImage,
+                  child: Text(
+                    
+                     Language == true ? 'اختيار صورة' : 'Pick an Image',
                     ),
-            ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _pickImage,
-              child: Text('Pick an Image'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-              ),
-            ),
-            SizedBox(height: 16),
-            // First Name
-            TextFormField(
-              controller: _firstNameController,
-              decoration: InputDecoration(
-                labelText: 'First Name',
-                labelStyle: TextStyle(color: Colors.blueAccent),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blueAccent),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 226, 148, 255),
+                  ),
                 ),
-                border: OutlineInputBorder(),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'First name is required';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: 16),
-            // Last Name
-            TextFormField(
-              controller: _lastNameController,
-              decoration: InputDecoration(
-                labelText: 'Last Name',
-                labelStyle: TextStyle(color: Colors.blueAccent),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blueAccent),
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: _firstNameController,
+                  decoration: InputDecoration(
+                    labelText: 'First Name',
+                    labelStyle:
+                        TextStyle(color: Color.fromARGB(255, 144, 29, 186)),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Color.fromARGB(255, 144, 29, 186)),
+                    ),
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'First name is required';
+                    }
+                    return null;
+                  },
                 ),
-                border: OutlineInputBorder(),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Last name is required';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: 16),
-            // Phone Number
-            TextFormField(
-              controller: _phoneController,
-              decoration: InputDecoration(
-                labelText: 'Phone Number',
-                labelStyle: TextStyle(color: Colors.blueAccent),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blueAccent),
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: _lastNameController,
+                  decoration: InputDecoration(
+                    labelText: 'Last Name',
+                    labelStyle:
+                        TextStyle(color: Color.fromARGB(255, 144, 29, 186)),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Color.fromARGB(255, 144, 29, 186)),
+                    ),
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Last name is required';
+                    }
+                    return null;
+                  },
                 ),
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.phone,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Phone number is required';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: 16),
-            // Email
-            TextFormField(
-              controller: _emailController,
-              decoration: InputDecoration(
-                labelText: 'Email',
-                labelStyle: TextStyle(color: Colors.blueAccent),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blueAccent),
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: _phoneController,
+                  decoration: InputDecoration(
+                    labelText: 'Phone Number',
+                    labelStyle:
+                        TextStyle(color: Color.fromARGB(255, 144, 29, 186)),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Color.fromARGB(255, 144, 29, 186)),
+                    ),
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.phone,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Phone number is required';
+                    }
+                    return null;
+                  },
                 ),
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.emailAddress,
-              validator: (value) {
-                if (value == null || value.isEmpty || !RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$').hasMatch(value)) {
-                  return 'Please enter a valid email';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: 16),
-            // Password
-            TextFormField(
-              controller: _passwordController,
-              decoration: InputDecoration(
-                labelText: 'Password',
-                labelStyle: TextStyle(color: Colors.blueAccent),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blueAccent),
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    labelStyle:
+                        TextStyle(color: Color.fromARGB(255, 144, 29, 186)),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Color.fromARGB(255, 144, 29, 186)),
+                    ),
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value == null ||
+                        value.isEmpty ||
+                        !RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$')
+                            .hasMatch(value)) {
+                      return 'Please enter a valid email';
+                    }
+                    return null;
+                  },
                 ),
-                border: OutlineInputBorder(),
-              ),
-              obscureText: true,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Password is required';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: 16),
-            // Confirm Password
-            TextFormField(
-              controller: _confirmPasswordController,
-              decoration: InputDecoration(
-                labelText: 'Confirm Password',
-                labelStyle: TextStyle(color: Colors.blueAccent),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blueAccent),
+                SizedBox(height: 16),
+                TextFormField(
+                  controller: _LocationController,
+                  decoration: InputDecoration(
+                    labelText: 'Location',
+                    labelStyle:
+                        TextStyle(color: Color.fromARGB(255, 144, 29, 186)),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Color.fromARGB(255, 144, 29, 186)),
+                    ),
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Location is required';
+                    }
+                    return null;
+                  },
                 ),
-                border: OutlineInputBorder(),
-              ),
-              obscureText: true,
-              validator: (value) {
-                if (value != _passwordController.text) {
-                  return 'Password and confirmation do not match';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: 16),
-            // PIN Code
-            TextFormField(
-              controller: _pinController,
-              decoration: InputDecoration(
-                labelText: 'PIN Code',
-                labelStyle: TextStyle(color: Colors.blueAccent),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blueAccent),
+                SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: _updateProfile,
+                  child: Text(
+                   Language == true ? 'حفظ' : 'Save',
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 226, 148, 255),
+                    minimumSize: Size(double.infinity, 50),
+                  ),
                 ),
-                border: OutlineInputBorder(),
-              ),
-              obscureText: true,
-              keyboardType: TextInputType.number,
-              maxLength: 4, // Restricting PIN length to 4 characters
-              validator: (value) {
-                if (value == null || value.length != 4) {
-                  return 'PIN code must be 4 digits';
-                }
-                return null;
-              },
+              ],
             ),
-            SizedBox(height: 20),
-            // Submit Button
-            ElevatedButton(
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  // Process the form data
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Data saved successfully')));
-                }
-              },
-              child: Text('Save'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                minimumSize: Size(double.infinity, 50),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

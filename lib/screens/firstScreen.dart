@@ -1,35 +1,33 @@
-// ignore: file_names
 import 'package:delivery/screens/loginScreen.dart';
 import 'package:flutter/material.dart';
 
-// ignore: use_key_in_widget_constructors
 class FirstScreen extends StatefulWidget {
   @override
-  // ignore: library_private_types_in_public_api
   _FirstScreenState createState() => _FirstScreenState();
 }
 
 class _FirstScreenState extends State<FirstScreen>
     with SingleTickerProviderStateMixin {
-  String? email;
-  String? password;
-
   late AnimationController _controller;
-  late Animation<Offset> _animation;
+  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
 
-    _controller = AnimationController(
-      duration: const Duration(seconds: 9),
-      vsync: this,
-    )..repeat();
 
-    _animation = Tween<Offset>(
-      begin:const Offset(-1.0, 0.0),
-      end:const Offset(1.0, 0.0),
-    ).animate(_controller);
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat(reverse: true); 
+
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.1,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    ));
   }
 
   @override
@@ -41,80 +39,98 @@ class _FirstScreenState extends State<FirstScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:const Color(0xff303644),
+      backgroundColor: const Color(0xff371353),
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-          const  SizedBox(
-              height: 85,
+          
+            Image.asset(
+              'lib/assest/first.png',
+              width: 300,
+              height: 300,
             ),
-            SlideTransition(
-              position: _animation,
-              child: Image.asset(
-                'lib/assest/image1.jpg',
-                height: 250,
+         
+            const Center(
+              child: Text(
+                'GOSwift',
+                style: TextStyle(
+                  fontSize: 52,
+                  color: Color(0xffC47DFF),
+                  fontFamily: 'Pacifico',
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          const  SizedBox(
-              height: 56,
-            ),
-           const Center(
-                child: Text(
-              'GOSwifty',
+            const SizedBox(height: 36),
+            const Text(
+              'From Us to you, Faster Than Ever',
               style: TextStyle(
-                  fontSize: 52,
-                  color: Color.fromARGB(255, 136, 245, 225),
-                  fontFamily: 'Pacifico',
-                  fontWeight: FontWeight.bold),
-            )),
-           const SizedBox(
-              height: 36,
+                fontSize: 22,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-           const Text(
-              'From Us to you , Faster Than Ever',
-              style: TextStyle(
-                  fontSize: 22,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold),
-            ),
-           const SizedBox(
-              height: 16,
-            ),
-          const  Text(
-              " Let's Start .. ",
+            const SizedBox(height: 16),
+            const Text(
+              "Let's Start ..",
               style: TextStyle(
                 fontSize: 22,
                 color: Colors.white,
               ),
             ),
-          const  SizedBox(
-              height: 36,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(right: 40),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  GestureDetector(
-                     onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=>Loginscreen()));
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color:const Color.fromARGB(255, 136, 245, 225),
-                        borderRadius: BorderRadius.circular(96),
-                      ),
-                      height: 50,
-                      width: 50,
-                      child:const Icon(
-                        size: 52,
-                        Icons.navigate_next,
-                        color: Colors.white,
-                      ),
+            const SizedBox(height: 36),
+        
+            ScaleTransition(
+              scale: _scaleAnimation,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Loginscreen()),
+                  );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        const Color(0xffC47DFF),
+                        const Color(0xffE3B2FF),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
+                    borderRadius: BorderRadius.circular(96),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.purpleAccent.withOpacity(0.6),
+                        blurRadius: 8,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
                   ),
-                ],
+                  height: 80,
+                  width: 220,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "GET STARTED",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      const Icon(
+                        Icons.arrow_forward,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],
